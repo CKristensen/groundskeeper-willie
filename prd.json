@@ -33,7 +33,7 @@
       ],
       "priority": 1.1,
       "passes": true,
-      "notes": "Completed. All instances of agent-worktree renamed to willie in both shell function files. Removed --claude and --codex flags, simplified to only support Claude Code. Updated all help messages and examples. Commands are now: willie, willie-list, willie-clean, willie-help. Shellcheck best practices followed."
+      "notes": "Completed and enhanced. All instances of agent-worktree renamed to willie in both shell function files. Removed --claude and --codex flags, simplified to only support Claude Code. Consolidated into single command with flags: willie <task-id>, willie --status, willie --clean <task-id>, willie --help. Task IDs never conflict with commands. Updated all documentation (README.md, AGENTS.md, CLAUDE.md). Shellcheck best practices followed."
     },
     {
       "id": "US-002",
