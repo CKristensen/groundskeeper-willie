@@ -345,6 +345,112 @@ update_config() {
     return 0
 }
 
+# Verify that installation succeeded by testing if willie function is loadable
+# Args: shell_type
+# Returns: 0 if verification succeeds, 1 if it fails
+verify_installation() {
+    local shell_type="$1"
+    local functions_path="$HOME/.groundskeeper-willie/worktree-agent-functions"
+
+    # Determine the correct functions file extension
+    if [[ "$shell_type" == "fish" ]]; then
+        functions_path="${functions_path}.fish"
+    else
+        functions_path="${functions_path}.sh"
+    fi
+
+    # Try to source the functions file in a subshell and check if willie exists
+    if [[ "$shell_type" == "fish" ]]; then
+        # For fish shell, test if the function file is valid
+        if fish -c "source $functions_path; functions -q willie" 2>/dev/null; then
+            return 0
+        else
+            return 1
+        fi
+    else
+        # For bash/zsh, source and test in a subshell
+        if bash -c "source '$functions_path' && type willie" >/dev/null 2>&1; then
+            return 0
+        else
+            return 1
+        fi
+    fi
+}
+
+# Print success message with next steps and usage guidance
+# Args: shell_type, config_file
+print_success_message() {
+    local shell_type="$1"
+    local config_file="$2"
+    local github_repo_url="https://github.com/CKristensen/groundskeeper-willie"
+
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    print_success "Groundskeeper Willie is installed and ready!"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+
+    print_info "Next Steps:"
+    echo ""
+
+    echo "1. Activate the installation:"
+    echo ""
+    if [[ "$shell_type" == "fish" ]]; then
+        echo "   Restart your fish shell, or run:"
+        echo "   ${YELLOW}source $config_file${NC}"
+    else
+        echo "   Restart your shell, or run:"
+        echo "   ${YELLOW}source $config_file${NC}"
+    fi
+    echo ""
+
+    echo "2. Verify installation:"
+    echo ""
+    echo "   ${YELLOW}type willie${NC}"
+    echo ""
+    echo "   You should see: \"willie is a function\""
+    echo ""
+
+    echo "3. Try your first command:"
+    echo ""
+    echo "   ${YELLOW}willie PCT-123${NC}"
+    echo ""
+    echo "   Or for autonomous development:"
+    echo "   ${YELLOW}willie --next${NC}"
+    echo ""
+
+    print_info "Quick Start:"
+    echo ""
+    echo "  ${YELLOW}willie <task-id>${NC}     Create worktree and launch Claude Code"
+    echo "  ${YELLOW}willie --next${NC}        Auto-launch next ticket from prd.json"
+    echo "  ${YELLOW}willie --status${NC}      List all active worktrees"
+    echo "  ${YELLOW}willie --clean <id>${NC}  Remove a worktree"
+    echo "  ${YELLOW}willie --help${NC}        Show detailed help"
+    echo ""
+
+    print_info "Documentation:"
+    echo ""
+    echo "  ${github_repo_url}#quick-start"
+    echo ""
+
+    print_info "Uninstall Instructions:"
+    echo ""
+    echo "  1. Remove the source line from: $config_file"
+    echo "     (Look for lines between '# >>> groundskeeper-willie >>>')"
+    echo ""
+    echo "  2. If needed, restore from backup:"
+    echo "     ${YELLOW}cp ${config_file}.backup.* $config_file${NC}"
+    echo ""
+    echo "  3. Remove installed files:"
+    echo "     ${YELLOW}rm -rf ~/.groundskeeper-willie${NC}"
+    echo ""
+
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    print_success "Happy coding with Groundskeeper Willie!"
+    echo ""
+}
+
 # Main installation flow
 main() {
     print_info "Groundskeeper Willie Installer"
@@ -402,13 +508,21 @@ main() {
         exit 1
     fi
 
-    # TODO: Additional installation steps will be added in future user stories
-    # - Verify installation (US-004)
-    # - Print success message (US-004)
-
+    # Verify installation
     echo ""
-    print_success "Installation complete!"
-    print_info "Restart your shell or run: source $config_file"
+    print_info "Verifying installation..."
+    if verify_installation "$shell_type"; then
+        print_success "Installation verified successfully"
+    else
+        print_error "Installation verification failed"
+        print_info "The functions file was installed but couldn't be loaded."
+        print_info "This may be a shell compatibility issue."
+        print_info "Try manually sourcing: source $config_file"
+        exit 1
+    fi
+
+    # Print success message with next steps
+    print_success_message "$shell_type" "$config_file"
 }
 
 # Run main function
