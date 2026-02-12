@@ -2,19 +2,14 @@
 # Add these to your ~/.config/fish/config.fish
 
 # Main function: Create worktree and launch agent
-function agent-worktree
+function willie
     set -l task_id ""
-    set -l agent "claude"  # default to claude
     set -l base_branch ""
 
     # Parse arguments
     set -l i 1
     while test $i -le (count $argv)
         switch $argv[$i]
-            case --claude
-                set agent "claude"
-            case --codex
-                set agent "codex"
             case --from
                 set i (math $i + 1)
                 if test $i -le (count $argv)
@@ -36,12 +31,11 @@ function agent-worktree
 
     # Validate task ID
     if test -z "$task_id"
-        echo "Usage: agent-worktree <task-id> [--claude|--codex] [--from <base-branch>]"
+        echo "Usage: willie <task-id> [--from <base-branch>]"
         echo ""
         echo "Examples:"
-        echo "  agent-worktree PCT-522"
-        echo "  agent-worktree PCT-523 --codex"
-        echo "  agent-worktree hotfix-123 --from main"
+        echo "  willie PCT-522"
+        echo "  willie hotfix-123 --from main"
         return 1
     end
 
@@ -58,7 +52,7 @@ function agent-worktree
     # Check if worktree already exists
     if test -d "$worktree_dir"
         echo "Error: Worktree already exists at $worktree_dir"
-        echo "Remove it first with: agent-worktree-clean $task_id"
+        echo "Remove it first with: willie-clean $task_id"
         return 1
     end
 
@@ -84,7 +78,6 @@ function agent-worktree
     echo "  Task ID: $task_id"
     echo "  Branch: $branch_name (from $base_branch)"
     echo "  Location: $worktree_dir"
-    echo "  Agent: $agent"
     echo ""
 
     # Create worktree with new branch
@@ -95,36 +88,28 @@ function agent-worktree
 
     echo ""
     echo "Worktree created successfully!"
-    echo "Launching $agent agent..."
+    echo "Launching Claude Code..."
     echo ""
 
     # Save current directory
     set -l orig_dir (pwd)
 
-    # Change to worktree directory and launch agent
+    # Change to worktree directory and launch Claude
     cd "$worktree_dir"; or return 1
+    claude
 
-    if test "$agent" = "claude"
-        claude
-    else if test "$agent" = "codex"
-        codex
-    else
-        echo "Error: Unknown agent '$agent'"
-        return 1
-    end
-
-    # After agent exits, return to original directory
+    # After Claude exits, return to original directory
     cd "$orig_dir"
 end
 
 # List all worktrees
-function agent-worktree-list
+function willie-list
     echo "Git worktrees:"
     git worktree list
 end
 
 # Cleanup/remove worktree
-function agent-worktree-clean
+function willie-clean
     set -l task_id "$argv[1]"
 
     if test -z "$task_id"
@@ -132,8 +117,8 @@ function agent-worktree-clean
         echo ""
         git worktree list
         echo ""
-        echo "Usage: agent-worktree-clean <task-id>"
-        echo "   or: agent-worktree-clean --all  (remove all worktrees except main)"
+        echo "Usage: willie-clean <task-id>"
+        echo "   or: willie-clean --all  (remove all worktrees except main)"
         return 0
     end
 
@@ -188,47 +173,44 @@ function agent-worktree-clean
 end
 
 # Show help
-function agent-worktree-help
-    echo "Git Worktree Agent Helper Functions
+function willie-help
+    echo "Groundskeeper Willie - Git Worktree Helper for Claude Code
 
 COMMANDS:
-  agent-worktree <task-id> [options]
-      Create a new worktree and launch an agent
+  willie <task-id> [options]
+      Create a new worktree and launch Claude Code
 
       Options:
-        --claude     Use Claude Code (default)
-        --codex      Use Codex CLI
         --from <br>  Create branch from specified base branch
 
       Examples:
-        agent-worktree PCT-522
-        agent-worktree PCT-523 --codex
-        agent-worktree hotfix --from main
+        willie PCT-522
+        willie hotfix --from main
 
-  agent-worktree-list
+  willie-list
       List all active worktrees
 
-  agent-worktree-clean <task-id>
+  willie-clean <task-id>
       Remove a worktree and optionally its branch
 
       Use --all to remove all worktrees
 
       Examples:
-        agent-worktree-clean PCT-522
-        agent-worktree-clean --all
+        willie-clean PCT-522
+        willie-clean --all
 
-  agent-worktree-help
+  willie-help
       Show this help message
 
 WORKFLOW:
-  1. Run: agent-worktree PCT-522
-  2. Work in the agent session (in .worktrees/PCT-522/)
-  3. Exit the agent when done
-  4. Clean up: agent-worktree-clean PCT-522
+  1. Run: willie PCT-522
+  2. Work in Claude Code session (in .worktrees/PCT-522/)
+  3. Exit Claude when done
+  4. Clean up: willie-clean PCT-522
 
 NOTES:
   - Worktrees are stored in .worktrees/ (add to .gitignore)
   - Each worktree gets its own branch named after the task ID
-  - Multiple agents can work in different worktrees simultaneously
+  - Multiple Claude sessions can work in different worktrees simultaneously
   - Branches are NOT auto-deleted (manual cleanup)"
 end
