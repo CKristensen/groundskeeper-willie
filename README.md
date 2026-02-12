@@ -2,6 +2,10 @@
 
 > Like the primary adult presence on the school grounds, Groundskeeper Willie monitors the playground, maintains the premises, and keeps the kids (AI agents) from interfering with each other while they work.
 
+
+<img width="512" height="512" alt="Gemini_Generated_Image_knzxzmknzxzmknzx" src="https://github.com/user-attachments/assets/7ca10d96-91e1-4946-8373-11bb167e3ccf" />
+
+
 ## What is Groundskeeper Willie?
 
 Groundskeeper Willie is a set of shell functions that makes it easy to run multiple AI coding agents (Claude Code, Codex, etc.) in parallel without conflicts. It uses Git worktrees to create isolated workspaces, allowing multiple agents to work on different tasks simultaneously.
