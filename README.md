@@ -21,21 +21,32 @@ Groundskeeper Willie solution:
 
 ## Installation
 
-### For Bash/Zsh
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/CKristensen/groundskeeper-willie.git
+cd groundskeeper-willie
+```
+
+### 2. Source the functions in your shell
+
+#### For Bash/Zsh
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
-echo "source ~/path/to/groundskeeper-willie/worktree-agent-functions.sh" >> ~/.bashrc
+echo "source $PWD/worktree-agent-functions.sh" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### For Fish Shell
+#### For Fish Shell
 
 ```fish
 # Add to ~/.config/fish/config.fish
-echo "source ~/path/to/groundskeeper-willie/worktree-agent-functions.fish" >> ~/.config/fish/config.fish
+echo "source $PWD/worktree-agent-functions.fish" >> ~/.config/fish/config.fish
 source ~/.config/fish/config.fish
 ```
+
+**Note:** The `$PWD` variable will expand to the current directory, making the installation portable. If you move the repository later, update the path in your shell config file.
 
 ## Quick Start
 

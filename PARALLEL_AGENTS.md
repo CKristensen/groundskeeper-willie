@@ -197,15 +197,15 @@ Some things I've found useful:
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/groundskeeper-willie
+git clone https://github.com/CKristensen/groundskeeper-willie.git
 cd groundskeeper-willie
 
 # Bash/Zsh
-echo 'source /path/to/groundskeeper-willie/worktree-agent-functions.sh' >> ~/.bashrc
+echo "source $PWD/worktree-agent-functions.sh" >> ~/.bashrc
 source ~/.bashrc
 
 # Fish
-echo 'source /path/to/groundskeeper-willie/worktree-agent-functions.fish' >> ~/.config/fish/config.fish
+echo "source $PWD/worktree-agent-functions.fish" >> ~/.config/fish/config.fish
 source ~/.config/fish/config.fish
 ```
 
@@ -252,7 +252,7 @@ Like Willie keeping order on the school grounds, this tool maintains your reposi
 ---
 
 **Links:**
-- [Groundskeeper Willie GitHub Repository](#)
+- [Groundskeeper Willie GitHub Repository](https://github.com/CKristensen/groundskeeper-willie)
 - [Git Worktree Documentation](https://git-scm.com/docs/git-worktree)
 - [Ralph Agent System](https://github.com/anthropics/ralph)
 - [Getting Started Guide](./README.md)
