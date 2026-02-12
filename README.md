@@ -1,10 +1,10 @@
-# Ratatoskr
+# Groundskeeper Willie
 
-> Like the squirrel messenger of Yggdrasil, Ratatoskr helps you coordinate multiple AI agents working in parallel across different branches of your repository tree.
+> Like the primary adult presence on the school grounds, Groundskeeper Willie monitors the playground, maintains the premises, and keeps the kids (AI agents) from interfering with each other while they work.
 
-## What is Ratatoskr?
+## What is Groundskeeper Willie?
 
-Ratatoskr is a set of shell functions that makes it easy to run multiple AI coding agents (Claude Code, Codex, etc.) in parallel without conflicts. It uses Git worktrees to create isolated workspaces, allowing multiple agents to work on different tasks simultaneously.
+Groundskeeper Willie is a set of shell functions that makes it easy to run multiple AI coding agents (Claude Code, Codex, etc.) in parallel without conflicts. It uses Git worktrees to create isolated workspaces, allowing multiple agents to work on different tasks simultaneously.
 
 ## Why Git Worktrees?
 
@@ -13,7 +13,7 @@ Traditional workflow problems:
 - Switching branches disrupts ongoing work
 - Risk of agents interfering with each other's changes
 
-Ratatoskr solution:
+Groundskeeper Willie solution:
 - Each task gets its own worktree (isolated directory)
 - Each worktree has its own branch
 - Multiple agents work in parallel without conflicts
@@ -25,7 +25,7 @@ Ratatoskr solution:
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
-echo "source ~/Documents/carl/ratatoskr/worktree-agent-functions.sh" >> ~/.bashrc
+echo "source ~/path/to/groundskeeper-willie/worktree-agent-functions.sh" >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -33,7 +33,7 @@ source ~/.bashrc
 
 ```fish
 # Add to ~/.config/fish/config.fish
-echo "source ~/Documents/carl/ratatoskr/worktree-agent-functions.fish" >> ~/.config/fish/config.fish
+echo "source ~/path/to/groundskeeper-willie/worktree-agent-functions.fish" >> ~/.config/fish/config.fish
 source ~/.config/fish/config.fish
 ```
 
@@ -176,11 +176,11 @@ Force remove with git:
 git worktree remove .worktrees/<task-id> --force
 ```
 
-## Norse Mythology Reference
+## Simpsons Reference
 
-**Ratatoskr** (Old Norse: likely "drill-tooth" or "bore-tooth") is a squirrel in Norse mythology who runs up and down Yggdrasil (the world tree) carrying messages between the eagle perched atop and the dragon Níðhöggr beneath the roots.
+**Groundskeeper Willie** is the Scottish custodian and groundskeeper at Springfield Elementary School. He is the primary adult presence on the school grounds, frequently seen monitoring the playground, breaking up fights (or getting into them), and keeping the kids away from his tractor.
 
-Just as Ratatoskr coordinates between different realms of Yggdrasil, this tool helps you coordinate multiple AI agents working across different branches of your repository tree.
+Just as Willie maintains the school grounds and manages the chaos of the playground, this tool helps you maintain your repository and manage multiple AI agents working in parallel without letting them interfere with each other.
 
 ## License
 

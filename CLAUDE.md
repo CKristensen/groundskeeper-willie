@@ -1,10 +1,10 @@
-# Working on Ratatoskr with Claude Code
+# Working on Groundskeeper Willie with Claude Code
 
-This document provides context and guidelines for Claude Code (or any AI agent) working on the Ratatoskr project.
+This document provides context and guidelines for Claude Code (or any AI agent) working on the Groundskeeper Willie project.
 
 ## Project Overview
 
-**Name:** Ratatoskr (Norse mythology squirrel that runs up and down Yggdrasil)
+**Name:** Groundskeeper Willie (The Simpsons character who maintains the school grounds and monitors the playground)
 
 **Purpose:** Enable multiple AI coding agents to work in parallel using Git worktrees
 
@@ -17,7 +17,7 @@ This document provides context and guidelines for Claude Code (or any AI agent) 
 
 ### Core Concept
 
-Ratatoskr wraps Git's worktree functionality with AI agent lifecycle management:
+Groundskeeper Willie wraps Git's worktree functionality with AI agent lifecycle management:
 
 ```
 Repository Root
@@ -227,7 +227,7 @@ Before committing changes:
 
 ### Non-Goals
 
-What Ratatoskr intentionally doesn't do:
+What Groundskeeper Willie intentionally doesn't do:
 
 - ❌ Manage agent conversations/state
 - ❌ Direct agent-to-agent communication
@@ -337,7 +337,7 @@ When users ask for changes, clarify:
 - [Git Worktree Documentation](https://git-scm.com/docs/git-worktree)
 - [Bash Scripting Guide](https://www.gnu.org/software/bash/manual/)
 - [Fish Shell Documentation](https://fishshell.com/docs/current/)
-- [Norse Mythology - Ratatoskr](https://en.wikipedia.org/wiki/Ratatoskr)
+- [Groundskeeper Willie - Simpsons Wiki](https://simpsons.fandom.com/wiki/Groundskeeper_Willie)
 
 ## Meta: Improving This Document
 

@@ -1,4 +1,4 @@
-# Running multiple AI agents at once with Ratatoskr
+# Running multiple AI agents at once with Groundskeeper Willie
 
 ## The serial development bottleneck
 
@@ -10,9 +10,9 @@ While the agent implements authentication, the bug fix waits. While fixing the b
 
 This is kind of ridiculous when you think about it.
 
-## What Ratatoskr does
+## What Groundskeeper Willie does
 
-Ratatoskr is named after the squirrel in Norse mythology that runs up and down Yggdrasil carrying messages. The tool itself is much less mythical—it's a set of shell functions that wrap Git worktrees and make it easy to run multiple AI agents in parallel.
+Groundskeeper Willie is named after the Scottish custodian from The Simpsons who maintains the school grounds and keeps the kids from interfering with each other. Like Willie monitoring the playground, this tool helps you manage multiple AI agents working in parallel without conflicts.
 
 ### Quick Git worktrees primer
 
@@ -28,7 +28,7 @@ Your Repository
 └── main/                  (branch: main)
 ```
 
-Ratatoskr adds agent lifecycle management on top of this. Create a worktree, launch an agent, clean up when done.
+Groundskeeper Willie adds agent lifecycle management on top of this. Create a worktree, launch an agent, clean up when done.
 
 ## How it works
 
@@ -197,15 +197,15 @@ Some things I've found useful:
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/ratatoskr
-cd ratatoskr
+git clone https://github.com/yourusername/groundskeeper-willie
+cd groundskeeper-willie
 
 # Bash/Zsh
-echo 'source /path/to/ratatoskr/worktree-agent-functions.sh' >> ~/.bashrc
+echo 'source /path/to/groundskeeper-willie/worktree-agent-functions.sh' >> ~/.bashrc
 source ~/.bashrc
 
 # Fish
-echo 'source /path/to/ratatoskr/worktree-agent-functions.fish' >> ~/.config/fish/config.fish
+echo 'source /path/to/groundskeeper-willie/worktree-agent-functions.fish' >> ~/.config/fish/config.fish
 source ~/.config/fish/config.fish
 ```
 
@@ -243,16 +243,16 @@ I keep coming back to this: AI development doesn't have to be sequential.
 
 We treat AI agents like assistants who need constant supervision, so we work with one at a time. But nothing about the technology requires that. You can run multiple agents the same way you run multiple processes.
 
-Ratatoskr is just Git worktrees plus some shell functions. The interesting part is the mental shift—decomposing projects into parallel workstreams instead of sequential tasks.
+Groundskeeper Willie is just Git worktrees plus some shell functions. The interesting part is the mental shift—decomposing projects into parallel workstreams instead of sequential tasks.
 
 Combined with autonomous systems like Ralph, you start to see a different development model. Break a project into independent pieces. Launch agents on each piece. Let them work concurrently. Integrate at the end.
 
-The squirrel runs up and down the world tree, carrying messages between realms. This tool connects development workflows. The mythology is more interesting than the implementation, but the implementation works.
+Like Willie keeping order on the school grounds, this tool maintains your repository while letting multiple agents work independently. They each get their own space, and Willie makes sure they don't interfere with each other.
 
 ---
 
 **Links:**
-- [Ratatoskr GitHub Repository](#)
+- [Groundskeeper Willie GitHub Repository](#)
 - [Git Worktree Documentation](https://git-scm.com/docs/git-worktree)
 - [Ralph Agent System](https://github.com/anthropics/ralph)
 - [Getting Started Guide](./README.md)

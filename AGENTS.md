@@ -1,10 +1,10 @@
-# Agent Workflows with Ratatoskr
+# Agent Workflows with Groundskeeper Willie
 
-This document describes best practices and workflows for using multiple AI agents with Ratatoskr.
+This document describes best practices and workflows for using multiple AI agents with Groundskeeper Willie.
 
 ## Philosophy
 
-Ratatoskr enables a new way of working with AI coding agents:
+Groundskeeper Willie enables a new way of working with AI coding agents:
 
 - **Parallel Development**: Run multiple agents on different tasks simultaneously
 - **Isolation**: Each agent has its own workspace and won't interfere with others
