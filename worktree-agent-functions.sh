@@ -2,8 +2,39 @@
 # Git Worktree Agent Helper Functions
 # Add these to your ~/.bashrc or ~/.zshrc
 
-# Main function: Create worktree and launch agent
 willie() {
+  # Handle flags
+  local cmd="$1"
+
+  case "$cmd" in
+    --help|-h)
+      _willie_help
+      ;;
+    --status)
+      _willie_status
+      ;;
+    --clean)
+      shift
+      _willie_clean "$@"
+      ;;
+    "")
+      _willie_help
+      return 1
+      ;;
+    --*)
+      echo "Error: Unknown option '$cmd'"
+      echo "Use 'willie --help' for usage information"
+      return 1
+      ;;
+    *)
+      # Default: create worktree
+      _willie_create "$@"
+      ;;
+  esac
+}
+
+# Create worktree and launch agent
+_willie_create() {
   local task_id=""
   local base_branch=""
 
@@ -49,7 +80,7 @@ willie() {
   # Check if worktree already exists
   if [[ -d "$worktree_dir" ]]; then
     echo "Error: Worktree already exists at $worktree_dir"
-    echo "Remove it first with: willie-clean $task_id"
+    echo "Remove it first with: willie --clean $task_id"
     return 1
   fi
 
@@ -97,13 +128,13 @@ willie() {
 }
 
 # List all worktrees
-willie-list() {
+_willie_status() {
   echo "Git worktrees:"
   git worktree list
 }
 
 # Cleanup/remove worktree
-willie-clean() {
+_willie_clean() {
   local task_id="$1"
 
   if [[ -z "$task_id" ]]; then
@@ -111,8 +142,8 @@ willie-clean() {
     echo ""
     git worktree list
     echo ""
-    echo "Usage: willie-clean <task-id>"
-    echo "   or: willie-clean --all  (remove all worktrees except main)"
+    echo "Usage: willie --clean <task-id>"
+    echo "   or: willie --clean --all  (remove all worktrees)"
     return 0
   fi
 
@@ -168,41 +199,31 @@ willie-clean() {
 }
 
 # Show help
-willie-help() {
+_willie_help() {
   cat <<EOF
 Groundskeeper Willie - Git Worktree Helper for Claude Code
 
-COMMANDS:
-  willie <task-id> [options]
-      Create a new worktree and launch Claude Code
+USAGE:
+  willie <task-id> [--from <branch>]    Create worktree and launch Claude
+  willie --status                        List all worktrees
+  willie --clean <task-id>               Remove worktree
+  willie --help                          Show this help
 
-      Options:
-        --from <br>  Create branch from specified base branch
+OPTIONS:
+  --from <branch>    Create branch from specified base branch
 
-      Examples:
-        willie PCT-522
-        willie hotfix --from main
-
-  willie-list
-      List all active worktrees
-
-  willie-clean <task-id>
-      Remove a worktree and optionally its branch
-
-      Use --all to remove all worktrees
-
-      Examples:
-        willie-clean PCT-522
-        willie-clean --all
-
-  willie-help
-      Show this help message
+EXAMPLES:
+  willie PCT-522                Create worktree for task PCT-522
+  willie hotfix --from main     Create worktree from main branch
+  willie --status               List all active worktrees
+  willie --clean PCT-522        Remove worktree for PCT-522
+  willie --clean --all          Remove all worktrees
 
 WORKFLOW:
-  1. Run: willie PCT-522
-  2. Work in Claude Code session (in .worktrees/PCT-522/)
-  3. Exit Claude when done
-  4. Clean up: willie-clean PCT-522
+  1. willie PCT-522             # Create worktree and launch Claude
+  2. [Work in Claude session]   # Make changes in .worktrees/PCT-522/
+  3. [Exit Claude]              # Return to main workspace
+  4. willie --clean PCT-522     # Clean up when done
 
 NOTES:
   - Worktrees are stored in .worktrees/ (add to .gitignore)

@@ -16,20 +16,16 @@ Groundskeeper Willie enables a new way of working with AI coding agents:
 Currently supported AI CLI tools:
 
 ### Claude Code
-```bash
-agent-worktree <task-id> --claude
-# or (default)
-agent-worktree <task-id>
-```
 
-### Codex CLI
+By default, Groundskeeper Willie launches Claude Code:
+
 ```bash
-agent-worktree <task-id> --codex
+willie <task-id>
 ```
 
 ### Future Agents
 
-To add support for other agents, edit the shell functions and add additional cases to the agent selection logic.
+The current version focuses on Claude Code. Support for additional agents (Codex, Cursor, Aider, etc.) can be added by extending the shell functions.
 
 ## Workflow Patterns
 
@@ -39,13 +35,13 @@ Use when building multiple independent features:
 
 ```bash
 # Terminal 1: Feature A
-agent-worktree feature-auth --claude
+willie feature-auth
 
 # Terminal 2: Feature B
-agent-worktree feature-payments --claude
+willie feature-payments
 
 # Terminal 3: Feature C
-agent-worktree feature-notifications --codex
+willie feature-notifications
 ```
 
 **Benefits:**
@@ -59,10 +55,10 @@ Use when you want one agent building while another tests:
 
 ```bash
 # Terminal 1: Build feature
-agent-worktree PCT-522 --claude
+willie PCT-522
 
 # Terminal 2: Write tests for existing feature
-agent-worktree PCT-520-tests --claude --from PCT-520
+willie PCT-520-tests --from PCT-520
 ```
 
 **Benefits:**
@@ -76,10 +72,10 @@ Use when urgent fix needed while working on features:
 
 ```bash
 # Terminal 1: Ongoing feature work
-agent-worktree PCT-522 --claude
+willie PCT-522
 
 # Terminal 2: Urgent hotfix from production
-agent-worktree hotfix-auth-bug --claude --from main
+willie hotfix-auth-bug --from main
 ```
 
 **Benefits:**
@@ -93,10 +89,10 @@ Use when refactoring while adding features:
 
 ```bash
 # Terminal 1: Major refactor
-agent-worktree refactor-api-layer --claude --from main
+willie refactor-api-layer --from main
 
 # Terminal 2: New feature on current code
-agent-worktree PCT-523 --claude
+willie PCT-523
 ```
 
 **Benefits:**
@@ -110,13 +106,13 @@ Use when breaking down large tasks:
 
 ```bash
 # Terminal 1: Backend API
-agent-worktree PCT-522-backend --claude --from main
+willie PCT-522-backend --from main
 
 # Terminal 2: Frontend UI
-agent-worktree PCT-522-frontend --claude --from main
+willie PCT-522-frontend --from main
 
 # Terminal 3: Tests
-agent-worktree PCT-522-tests --codex --from main
+willie PCT-522-tests --from main
 ```
 
 **Benefits:**
@@ -132,14 +128,14 @@ Use clear, consistent task IDs:
 
 ```bash
 # Good
-agent-worktree PCT-522           # Ticket number
-agent-worktree hotfix-auth       # Descriptive hotfix
-agent-worktree refactor-db       # Clear purpose
+willie PCT-522           # Ticket number
+willie hotfix-auth       # Descriptive hotfix
+willie refactor-db       # Clear purpose
 
 # Avoid
-agent-worktree test              # Too generic
-agent-worktree abc123            # Not meaningful
-agent-worktree my-work           # Not specific
+willie test              # Too generic
+willie abc123            # Not meaningful
+willie my-work           # Not specific
 ```
 
 ### Branch Management
@@ -147,13 +143,13 @@ agent-worktree my-work           # Not specific
 **Base branches:**
 ```bash
 # Feature from current branch (default)
-agent-worktree PCT-522
+willie PCT-522
 
 # Feature from main
-agent-worktree PCT-522 --from main
+willie PCT-522 --from main
 
 # Feature from another branch
-agent-worktree PCT-522-v2 --from PCT-522
+willie PCT-522-v2 --from PCT-522
 ```
 
 **Cleanup:**
@@ -161,19 +157,15 @@ agent-worktree PCT-522-v2 --from PCT-522
 - Delete branches that are merged
 - Use `--all` for bulk cleanup
 
-### Agent Selection
+### Using Claude Code
 
-**When to use Claude Code:**
+Claude Code excels at:
 - Complex refactoring
 - Architectural decisions
 - Code review and analysis
 - Full-stack development
-
-**When to use Codex:**
-- Focused implementations
 - Test writing
-- Quick fixes
-- Specific algorithms
+- Bug fixes and debugging
 
 ### Communication Between Agents
 
@@ -187,7 +179,7 @@ Agents don't directly communicate, but you can coordinate:
 
 ```bash
 # Check all active worktrees
-agent-worktree-list
+willie --status
 
 # Check git status across worktrees
 git worktree list
@@ -212,7 +204,7 @@ git pull origin main
 git merge PCT-522
 
 # Clean up
-agent-worktree-clean PCT-522
+willie --clean PCT-522
 ```
 
 ## Common Scenarios
@@ -221,20 +213,20 @@ agent-worktree-clean PCT-522
 
 ```bash
 # Terminal 1: Implement breaking change
-agent-worktree breaking-api-v2 --claude --from main
+willie breaking-api-v2 --from main
 
 # Terminal 2: Update dependent code
-agent-worktree update-clients --claude --from breaking-api-v2
+willie update-clients --from breaking-api-v2
 ```
 
 ### Scenario: A/B Testing Implementations
 
 ```bash
 # Terminal 1: Approach A
-agent-worktree solution-a --claude --from main
+willie solution-a --from main
 
 # Terminal 2: Approach B
-agent-worktree solution-b --claude --from main
+willie solution-b --from main
 
 # Compare, pick winner, delete loser
 ```
@@ -243,10 +235,10 @@ agent-worktree solution-b --claude --from main
 
 ```bash
 # Terminal 1: Implement feature
-agent-worktree PCT-522 --claude
+willie PCT-522
 
 # Terminal 2: Update docs
-agent-worktree docs-update --claude --from main
+willie docs-update --from main
 ```
 
 ## Troubleshooting Agent Issues
@@ -256,7 +248,7 @@ agent-worktree docs-update --claude --from main
 ```bash
 # Exit agent with Ctrl+C
 # Clean up worktree
-agent-worktree-clean <task-id>
+willie --clean <task-id>
 ```
 
 ### Agent Made Mistakes
@@ -264,7 +256,7 @@ agent-worktree-clean <task-id>
 ```bash
 # Don't merge the branch
 # Clean up worktree
-agent-worktree-clean <task-id>
+willie --clean <task-id>
 # Delete branch when prompted: Y
 ```
 
@@ -278,8 +270,6 @@ cd .worktrees/PCT-522
 
 # Start new agent session
 claude
-# or
-codex
 
 # Exit and return
 cd -

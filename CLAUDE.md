@@ -30,20 +30,24 @@ Repository Root
 
 ### Shell Function Flow
 
-1. **Creation** (`agent-worktree`):
+1. **Creation** (`willie <task-id>`):
    - Validate inputs
    - Check for conflicts (existing worktree/branch)
    - Create worktree with new branch
-   - Launch agent in worktree
+   - Launch Claude Code in worktree
    - Return to original directory on exit
 
-2. **Listing** (`agent-worktree-list`):
+2. **Status** (`willie --status`):
+   - List all active worktrees
    - Wrapper around `git worktree list`
 
-3. **Cleanup** (`agent-worktree-clean`):
+3. **Cleanup** (`willie --clean <task-id>`):
    - Remove worktree
    - Optionally delete branch
    - Support bulk cleanup with `--all`
+
+4. **Help** (`willie --help`):
+   - Show usage information
 
 ## Code Structure
 
@@ -83,10 +87,10 @@ Both versions must maintain identical functionality:
 3. **Test both versions**:
    ```bash
    # Test bash version
-   bash -c "source worktree-agent-functions.sh && agent-worktree-help"
+   bash -c "source worktree-agent-functions.sh && willie --help"
 
    # Test fish version
-   fish -c "source worktree-agent-functions.fish && agent-worktree-help"
+   fish -c "source worktree-agent-functions.fish && willie --help"
    ```
 
 ### When Fixing Bugs
@@ -129,6 +133,15 @@ if [ "$var" = "" ]
 end
 ```
 
+### Function Naming
+
+Internal helper functions are prefixed with `_`:
+- `willie()` - main entry point
+- `_willie_create()` - internal function for creating worktrees
+- `_willie_status()` - internal function for listing worktrees
+- `_willie_clean()` - internal function for cleanup
+- `_willie_help()` - internal function for help
+
 ## Design Decisions
 
 ### Why Manual Cleanup?
@@ -165,15 +178,17 @@ end
 - Matches typical workflow (tickets, issues)
 - No naming ambiguity
 
-### Why Support Multiple Agents?
+### Why Single Command Interface?
 
-**Decision:** `--claude` and `--codex` flags with extensibility
+**Decision:** Use `willie` as the main command with flags (--status, --clean, --help)
 
 **Rationale:**
-- Different agents have different strengths
-- User flexibility
-- Future-proof for new agents
-- Easy to extend
+- Simpler mental model
+- Task IDs never conflict with commands
+- Easier to remember
+- Cleaner namespace (no `willie-*` commands)
+- Better discoverability through `willie --help`
+- Flags are clearly distinguishable from task IDs
 
 ## Testing
 
@@ -182,12 +197,12 @@ end
 Before committing changes:
 
 - [ ] Create worktree with default options
-- [ ] Create worktree with `--codex` option
 - [ ] Create worktree with `--from main` option
-- [ ] List worktrees
+- [ ] Show help with `willie --help`
+- [ ] List worktrees with `willie --status`
 - [ ] Clean up worktree (keep branch)
 - [ ] Clean up worktree (delete branch)
-- [ ] Clean up all worktrees
+- [ ] Clean up all worktrees with `willie --clean --all`
 - [ ] Error handling: duplicate worktree
 - [ ] Error handling: duplicate branch
 - [ ] Error handling: invalid task ID
@@ -211,7 +226,7 @@ Before committing changes:
 **High Priority:**
 - [ ] Add support for more agents (Cursor, Aider, etc.)
 - [ ] Better error messages with suggestions
-- [ ] Worktree status command (show which are active)
+- [ ] Enhanced status (show active sessions, commit counts)
 
 **Medium Priority:**
 - [ ] Auto-cleanup merged worktrees
@@ -234,41 +249,48 @@ What Groundskeeper Willie intentionally doesn't do:
 - ❌ Project-specific configuration
 - ❌ CI/CD integration
 - ❌ GUI interface
+- ❌ Multiple agent support in single command (focus on Claude Code)
 
 ## Common Tasks
 
-### Add Support for New Agent
+### Add Support for New Flag
 
-1. Update argument parsing to accept new `--agent-name` flag
-2. Add case in agent launch section
-3. Update help text and documentation
-4. Test on both shell versions
+1. Create new internal function (e.g., `_willie_newcmd`)
+2. Add case to main `willie()` function
+3. Update help text in `_willie_help()`
+4. Update documentation
+5. Test on both shell versions
 
 Example:
 ```bash
-# In agent-worktree function, add:
-case --aider)
-    agent="aider"
-    shift
-    ;;
+# In main willie() function, add:
+case "$cmd" in
+    --newcmd)
+        shift
+        _willie_newcmd "$@"
+        ;;
+esac
 
-# In launch section, add:
-elif [[ "$agent" == "aider" ]]; then
-    aider
+# Create the function:
+_willie_newcmd() {
+    # Implementation
+}
 ```
 
 ### Change Worktree Location
 
-1. Update `worktree_dir` construction in `agent-worktree`
+1. Update `worktree_dir` construction in `willie`
 2. Update documentation (README.md)
 3. Update `.gitignore` examples
 
-### Add New Command
+### Modify Existing Flag
 
-1. Create function in both shell versions
-2. Add to help text
-3. Document in README.md
-4. Add workflow example to AGENTS.md if applicable
+1. Update the internal function (e.g., `_willie_clean`)
+2. Update help text if behavior changes
+3. Update documentation
+4. Test on both shell versions
+
+Note: Task ID handling is in the default case `*)` which calls `_willie_create`
 
 ## Git Workflow
 
@@ -312,16 +334,20 @@ fish --debug worktree-agent-functions.fish
 ### Common Issues
 
 **"Command not found"**
-- Check if function is sourced: `type agent-worktree`
+- Check if function is sourced: `type willie`
 - Verify shell config reload: `source ~/.bashrc`
 
 **"Worktree already exists"**
-- Check `git worktree list`
+- Check `willie --status` or `git worktree list`
 - Orphaned worktree: `git worktree prune`
 
 **"Permission denied"**
 - Check repo permissions
 - Verify `.worktrees/` is writable
+
+**"Unknown option"**
+- Use `willie --help` to see available options
+- Make sure flags start with `--`
 
 ## Questions for Users
 

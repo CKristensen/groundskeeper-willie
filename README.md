@@ -49,20 +49,17 @@ source ~/.bashrc  # or ~/.zshrc or ~/.config/fish/config.fish
 willie PCT-522
 
 # List all active worktrees
-willie-list
+willie --status
 
 # Clean up when done
-willie-clean PCT-522
+willie --clean PCT-522
 ```
 
 ## Commands
 
-### `willie <task-id> [options]`
+### `willie <task-id> [--from <branch>]`
 
 Create a new worktree and launch Claude Code.
-
-**Options:**
-- `--from <branch>` - Create branch from specified base branch
 
 **Examples:**
 ```bash
@@ -76,34 +73,30 @@ willie hotfix-123 --from main
 3. Launches Claude Code in that worktree
 4. Returns you to original directory when Claude Code exits
 
-### `willie-list`
+### `willie --status`
 
 List all active worktrees.
 
 ```bash
-willie-list
+willie --status
 ```
 
-### `willie-clean <task-id>`
+### `willie --clean <task-id>`
 
 Remove a worktree and optionally delete its branch.
 
-**Options:**
-- `<task-id>` - Clean specific worktree
-- `--all` - Clean all worktrees in `.worktrees/`
-
 **Examples:**
 ```bash
-willie-clean PCT-522
-willie-clean --all
+willie --clean PCT-522
+willie --clean --all  # Remove all worktrees
 ```
 
-### `willie-help`
+### `willie --help`
 
 Show detailed help message.
 
 ```bash
-willie-help
+willie --help
 ```
 
 ## Workflow Example
@@ -119,13 +112,16 @@ willie PCT-524    # Terminal 3
 # .worktrees/PCT-523/
 # .worktrees/PCT-524/
 
+# Check status of all worktrees
+willie --status
+
 # When done, clean up
-willie-clean PCT-522
-willie-clean PCT-523
-willie-clean PCT-524
+willie --clean PCT-522
+willie --clean PCT-523
+willie --clean PCT-524
 
 # Or clean all at once
-willie-clean --all
+willie --clean --all
 ```
 
 ## How It Works
@@ -158,7 +154,7 @@ Branches are automatically named after the task ID you provide. For example:
 
 Clean the existing worktree first:
 ```bash
-willie-clean <task-id>
+willie --clean <task-id>
 ```
 
 ### "Branch already exists"
