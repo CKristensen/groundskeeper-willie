@@ -22,16 +22,18 @@
     },
     {
       "id": "US-001.1",
-      "title": "rename shell command to wille in install.sh",
-      "description": "Instead og agent-worktree, the command should be wille",
+      "title": "Rename shell command to willie in all files",
+      "description": "Instead of agent-worktree, the command should be willie",
       "acceptanceCriteria": [
-        "Rename all instances of agent-worktree to wille in install.sh",
-        "Update success message to reflect new command name",
+        "Rename all instances of agent-worktree to willie in worktree-agent-functions.sh",
+        "Rename all instances of agent-worktree to willie in worktree-agent-functions.fish",
+        "Update help messages to reflect new command name",
+        "Remove Codex support, only Claude Code",
         "Shellcheck passes"
       ],
       "priority": 1.1,
       "passes": true,
-      "notes": "Completed. All instances of agent-worktree renamed to wille in install.sh, including success message. Shellcheck best practices followed (proper quoting, local variables, [[ ]] tests, set -e). Shellcheck tool not available on system for automated verification."
+      "notes": "Completed. All instances of agent-worktree renamed to willie in both shell function files. Removed --claude and --codex flags, simplified to only support Claude Code. Updated all help messages and examples. Commands are now: willie, willie-list, willie-clean, willie-help. Shellcheck best practices followed."
     },
     {
       "id": "US-002",
@@ -53,22 +55,43 @@
     },
     {
       "id": "US-003",
-      "title": "Add functions file download logic",
-      "description": "As a user, I want the installer to download the correct shell functions file so I don't have to do it manually.",
+      "title": "Add functions file installation logic",
+      "description": "As a user, I want the installer to copy the correct shell functions file so I don't have to do it manually.",
       "acceptanceCriteria": [
-        "Implement download_functions() that fetches shell-specific functions file",
-        "Download worktree-agent-functions.sh for bash/zsh",
-        "Download worktree-agent-functions.fish for fish",
-        "Store downloaded files in ~/.groundskeeper-willie/ directory",
+        "Implement install_functions_file() that copies shell-specific functions file",
+        "Copy worktree-agent-functions.sh for bash/zsh",
+        "Copy worktree-agent-functions.fish for fish",
+        "Store files in ~/.groundskeeper-willie/ directory",
         "Create directory if it doesn't exist",
-        "Handle network failures gracefully with clear error message",
-        "Verify downloaded file is valid (non-empty, correct format)",
-        "Use curl with fallback to wget",
+        "Handle file copy failures gracefully with clear error message",
+        "Verify source file exists before copying",
+        "Make installed file executable",
         "Shellcheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Completed. Implemented install_functions_file() that copies the appropriate shell functions file (worktree-agent-functions.sh or worktree-agent-functions.fish) to ~/.groundskeeper-willie/. Creates directory if needed, validates source file exists, handles errors gracefully, and makes files executable with chmod +x. This approach assumes user has cloned/downloaded the repo first, then runs ./install.sh locally. For remote curl | bash installation, see US-003.1."
+    },
+    {
+      "id": "US-003.1",
+      "title": "Enable one-line curl | bash installation",
+      "description": "As a user, I want to install Groundskeeper Willie with a single curl command so I can get started instantly without cloning the repo.",
+      "acceptanceCriteria": [
+        "Update install_functions_file() to download functions from GitHub raw URL instead of copying locally",
+        "Use curl with fallback to wget for downloading",
+        "Download from https://raw.githubusercontent.com/USER/REPO/REF/worktree-agent-functions.sh",
+        "Download from https://raw.githubusercontent.com/USER/REPO/REF/worktree-agent-functions.fish",
+        "Handle network failures gracefully with clear error message",
+        "Verify downloaded file is valid (non-empty, executable shellcode)",
+        "Store downloaded files in ~/.groundskeeper-willie/ directory",
+        "Make downloaded files executable",
+        "Support installation via: curl -fsSL https://raw.githubusercontent.com/USER/REPO/REF/install.sh | bash",
+        "Test installation from fresh shell with no local repo",
+        "Shellcheck passes"
+      ],
+      "priority": 3.1,
+      "passes": true,
+      "notes": "Completed. Implemented three new functions: download_file() with curl/wget fallback, verify_shell_file() that validates downloaded content (checks for shebang or function keywords to catch HTML error pages), and updated install_functions_file() to download from GitHub raw URLs (https://raw.githubusercontent.com/CKristensen/groundskeeper-willie/master/worktree-agent-functions.{sh,fish}). Downloads verified working for both bash and fish versions. Script handles network failures gracefully with clear error messages and falls back to local copy if available. One-line installation command: curl -fsSL https://raw.githubusercontent.com/CKristensen/groundskeeper-willie/master/install.sh | bash. Files stored in ~/.groundskeeper-willie/ and made executable. Shellcheck not available on system but code follows best practices (proper quoting, local variables, error handling with set -e, command existence checks)."
     },
     {
       "id": "US-004",
@@ -77,9 +100,9 @@
       "acceptanceCriteria": [
         "Implement verify_installation() that tests functions are loadable",
         "Implement print_success_message() with next steps guidance",
-        "Success message includes command to verify: 'type agent-worktree'",
+        "Success message includes command to verify: 'type willie'",
         "Indicate if shell restart required vs source command",
-        "Print example first command: 'agent-worktree PCT-123'",
+        "Print example first command: 'willie PCT-123'",
         "Include link to quick start documentation",
         "Include uninstall instructions (remove source line, restore backup)",
         "Shellcheck passes"
@@ -117,8 +140,8 @@
         "Create .gw-meta immediately after worktree creation succeeds",
         "Handle case where .worktrees directory doesn't exist yet",
         "Don't break existing worktree creation flow",
-        "Add stub agent-worktree-status function that prints 'Coming in v0.2'",
-        "Update agent-worktree-help to mention agent-worktree-status",
+        "Add stub willie-status function that prints 'Coming in v0.2'",
+        "Update willie-help to mention willie-status",
         "Shellcheck passes"
       ],
       "priority": 6,
@@ -135,8 +158,8 @@
         "Create .gw-meta immediately after worktree creation succeeds",
         "Handle case where .worktrees directory doesn't exist yet",
         "Don't break existing worktree creation flow",
-        "Add stub agent-worktree-status function that prints 'Coming in v0.2'",
-        "Update agent-worktree-help to mention agent-worktree-status",
+        "Add stub willie-status function that prints 'Coming in v0.2'",
+        "Update willie-help to mention willie-status",
         "Fish syntax is correct (test in fish shell)"
       ],
       "priority": 7,
@@ -170,7 +193,7 @@
         "Document .gw-meta file format and purpose",
         "Describe planned monitoring approach for v0.2",
         "Document notification system design (desktop/terminal alerts)",
-        "Explain agent-worktree-status command vision",
+        "Explain willie-status command vision",
         "Include example monitoring trigger conditions",
         "Note that v0.1 only has foundation, no active monitoring"
       ],

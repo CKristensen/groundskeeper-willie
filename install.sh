@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 #
 # Groundskeeper Willie Installer
-# One-line installation: curl -sSL <url> | bash
+#
+# One-line installation:
+#   curl -fsSL https://raw.githubusercontent.com/CKristensen/groundskeeper-willie/master/install.sh | bash
+#
+# Or run locally from repository:
+#   ./install.sh
 #
 
 set -e  # Exit on error
@@ -156,29 +161,82 @@ backup_config() {
     fi
 }
 
+# Download a file using curl or wget (fallback)
+# Args: url, output_path
+download_file() {
+    local url="$1"
+    local output_path="$2"
+
+    # Try curl first (more common in one-line installations)
+    if command -v curl >/dev/null 2>&1; then
+        if curl -fsSL "$url" -o "$output_path"; then
+            return 0
+        else
+            return 1
+        fi
+    # Fallback to wget
+    elif command -v wget >/dev/null 2>&1; then
+        if wget -q -O "$output_path" "$url"; then
+            return 0
+        else
+            return 1
+        fi
+    else
+        print_error "Neither curl nor wget is available. Please install one of them."
+        return 1
+    fi
+}
+
+# Verify downloaded file is valid shell code
+# Args: file_path
+verify_shell_file() {
+    local file_path="$1"
+
+    # Check file exists and is not empty
+    if [[ ! -f "$file_path" ]]; then
+        print_error "Downloaded file not found: $file_path"
+        return 1
+    fi
+
+    if [[ ! -s "$file_path" ]]; then
+        print_error "Downloaded file is empty: $file_path"
+        return 1
+    fi
+
+    # Basic validation: check for shell shebang or function keyword
+    # This catches obvious download failures (HTML error pages, etc.)
+    if head -n 20 "$file_path" | grep -qE '(^#!|function |^function)'; then
+        return 0
+    else
+        print_error "Downloaded file does not appear to be valid shell code: $file_path"
+        print_info "This may indicate a network issue or incorrect URL."
+        return 1
+    fi
+}
+
 # Install the functions file to ~/.groundskeeper-willie/
+# Downloads from GitHub or copies from local repo if available
 # Args: shell_type
 install_functions_file() {
     local shell_type="$1"
     local install_dir="$HOME/.groundskeeper-willie"
-    local source_file=""
+    local functions_file=""
     local target_file=""
+
+    # GitHub repository information
+    local github_user="CKristensen"
+    local github_repo="groundskeeper-willie"
+    local github_ref="master"  # Use master branch by default
+    local base_url="https://raw.githubusercontent.com/${github_user}/${github_repo}/${github_ref}"
 
     # Determine which functions file to install
     if [[ "$shell_type" == "fish" ]]; then
-        source_file="worktree-agent-functions.fish"
-        target_file="$install_dir/worktree-agent-functions.fish"
+        functions_file="worktree-agent-functions.fish"
     else
-        source_file="worktree-agent-functions.sh"
-        target_file="$install_dir/worktree-agent-functions.sh"
+        functions_file="worktree-agent-functions.sh"
     fi
 
-    # Check if source file exists
-    if [[ ! -f "$source_file" ]]; then
-        print_error "Functions file not found: $source_file"
-        print_info "Are you running this from the groundskeeper-willie repository directory?"
-        return 1
-    fi
+    target_file="$install_dir/$functions_file"
 
     # Create installation directory if it doesn't exist
     if [[ ! -d "$install_dir" ]]; then
@@ -188,20 +246,41 @@ install_functions_file() {
         fi
     fi
 
-    # Copy functions file
-    if ! cp "$source_file" "$target_file"; then
-        print_error "Failed to copy $source_file to $target_file"
+    # Try to download from GitHub
+    print_info "Downloading $functions_file from GitHub..."
+    local download_url="${base_url}/${functions_file}"
+
+    if download_file "$download_url" "$target_file"; then
+        # Verify the downloaded file
+        if verify_shell_file "$target_file"; then
+            # Make it executable
+            if ! chmod +x "$target_file"; then
+                print_error "Failed to make $target_file executable"
+                return 1
+            fi
+            print_success "Downloaded and installed: $target_file"
+            return 0
+        else
+            # Verification failed, remove invalid file
+            rm -f "$target_file"
+            print_error "Downloaded file failed validation"
+            return 1
+        fi
+    else
+        print_error "Failed to download from $download_url"
+        print_info "Please check your internet connection and try again."
+
+        # Fallback: try local copy if we're in a git repo
+        if [[ -f "$functions_file" ]]; then
+            print_info "Attempting to install from local repository..."
+            if cp "$functions_file" "$target_file" && chmod +x "$target_file"; then
+                print_success "Installed from local copy: $target_file"
+                return 0
+            fi
+        fi
+
         return 1
     fi
-
-    # Make it executable
-    if ! chmod +x "$target_file"; then
-        print_error "Failed to make $target_file executable"
-        return 1
-    fi
-
-    print_success "Installed: $target_file"
-    return 0
 }
 
 # Update config file with source line for Groundskeeper Willie

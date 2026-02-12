@@ -8,7 +8,7 @@
 
 ## What is Groundskeeper Willie?
 
-Groundskeeper Willie is a set of shell functions that makes it easy to run multiple AI coding agents (Claude Code, Codex, etc.) in parallel without conflicts. It uses Git worktrees to create isolated workspaces, allowing multiple agents to work on different tasks simultaneously.
+Groundskeeper Willie is a set of shell functions that makes it easy to run multiple Claude Code agents in parallel without conflicts. It uses Git worktrees to create isolated workspaces, allowing multiple agents to work on different tasks simultaneously.
 
 ## Why Git Worktrees?
 
@@ -25,82 +25,66 @@ Groundskeeper Willie solution:
 
 ## Installation
 
-### 1. Clone the repository
+One line. That's all you need:
 
 ```bash
-git clone https://github.com/CKristensen/groundskeeper-willie.git
-cd groundskeeper-willie
+curl -fsSL https://raw.githubusercontent.com/CKristensen/groundskeeper-willie/master/install.sh | bash
 ```
 
-### 2. Source the functions in your shell
+This will:
+- Detect your shell (bash, zsh, or fish)
+- Download the appropriate functions file
+- Update your shell config automatically
+- Create a backup of your config file
 
-#### For Bash/Zsh
-
+After installation, restart your shell or run:
 ```bash
-# Add to ~/.bashrc or ~/.zshrc
-echo "source $PWD/worktree-agent-functions.sh" >> ~/.bashrc
-source ~/.bashrc
+source ~/.bashrc  # or ~/.zshrc or ~/.config/fish/config.fish
 ```
-
-#### For Fish Shell
-
-```fish
-# Add to ~/.config/fish/config.fish
-echo "source $PWD/worktree-agent-functions.fish" >> ~/.config/fish/config.fish
-source ~/.config/fish/config.fish
-```
-
-**Note:** The `$PWD` variable will expand to the current directory, making the installation portable. If you move the repository later, update the path in your shell config file.
 
 ## Quick Start
 
 ```bash
 # Create a worktree and launch Claude Code
-agent-worktree PCT-522
-
-# Create a worktree with Codex
-agent-worktree PCT-523 --codex
+willie PCT-522
 
 # List all active worktrees
-agent-worktree-list
+willie-list
 
 # Clean up when done
-agent-worktree-clean PCT-522
+willie-clean PCT-522
 ```
 
 ## Commands
 
-### `agent-worktree <task-id> [options]`
+### `willie <task-id> [options]`
 
-Create a new worktree and launch an agent.
+Create a new worktree and launch Claude Code.
 
 **Options:**
-- `--claude` - Use Claude Code (default)
-- `--codex` - Use Codex CLI
 - `--from <branch>` - Create branch from specified base branch
 
 **Examples:**
 ```bash
-agent-worktree PCT-522
-agent-worktree PCT-523 --codex
-agent-worktree hotfix-123 --from main
+willie PCT-522
+willie hotfix-123 --from main
 ```
 
 **What it does:**
 1. Creates a worktree in `.worktrees/<task-id>/`
 2. Creates a new branch named after the task ID
-3. Launches the specified agent in that worktree
-4. Returns you to original directory when agent exits
+3. Launches Claude Code in that worktree
+4. Returns you to original directory when Claude Code exits
 
-### `agent-worktree-list`
+### `willie-list`
 
 List all active worktrees.
 
 ```bash
-agent-worktree-list
+willie-list
 ```
 
-### `agent-worktree-clean <task-id>`
+### `willie-clean <task-id>`
 
 Remove a worktree and optionally delete its branch.
 
@@ -110,25 +94,25 @@ Remove a worktree and optionally delete its branch.
 
 **Examples:**
 ```bash
-agent-worktree-clean PCT-522
-agent-worktree-clean --all
+willie-clean PCT-522
+willie-clean --all
 ```
 
-### `agent-worktree-help`
+### `willie-help`
 
 Show detailed help message.
 
 ```bash
-agent-worktree-help
+willie-help
 ```
 
 ## Workflow Example
 
 ```bash
 # Start three parallel tasks
-agent-worktree PCT-522 --claude    # Terminal 1
-agent-worktree PCT-523 --codex     # Terminal 2
-agent-worktree PCT-524 --claude    # Terminal 3
+willie PCT-522    # Terminal 1
+willie PCT-523    # Terminal 2
+willie PCT-524    # Terminal 3
 
 # Each agent works independently in:
 # .worktrees/PCT-522/
@@ -136,12 +120,12 @@ agent-worktree PCT-524 --claude    # Terminal 3
 # .worktrees/PCT-524/
 
 # When done, clean up
-agent-worktree-clean PCT-522
-agent-worktree-clean PCT-523
-agent-worktree-clean PCT-524
+willie-clean PCT-522
+willie-clean PCT-523
+willie-clean PCT-524
 
 # Or clean all at once
-agent-worktree-clean --all
+willie-clean --all
 ```
 
 ## How It Works
@@ -165,8 +149,8 @@ Worktrees are stored in `.worktrees/` inside your repository root. Make sure to 
 ### Branch Naming
 
 Branches are automatically named after the task ID you provide. For example:
-- `agent-worktree PCT-522` creates branch `PCT-522`
-- `agent-worktree hotfix-auth` creates branch `hotfix-auth`
+- `willie PCT-522` creates branch `PCT-522`
+- `willie hotfix-auth` creates branch `hotfix-auth`
 
 ## Troubleshooting
 
@@ -174,7 +158,7 @@ Branches are automatically named after the task ID you provide. For example:
 
 Clean the existing worktree first:
 ```bash
-agent-worktree-clean <task-id>
+willie-clean <task-id>
 ```
 
 ### "Branch already exists"
