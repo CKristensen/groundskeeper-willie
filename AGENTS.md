@@ -120,6 +120,59 @@ willie PCT-522-tests --from main
 - Specialized agents per layer
 - Faster completion
 
+### Pattern 6: Autonomous PRD-Driven Development
+
+Use when working through a backlog of tickets defined in a PRD:
+
+```bash
+# Let Willie automatically pick the next highest priority ticket
+willie --next
+
+# Or run multiple autonomous agents in parallel
+willie --next    # Terminal 1 - picks US-004
+willie --next    # Terminal 2 - picks US-005
+willie --next    # Terminal 3 - picks US-006
+```
+
+**What happens:**
+1. Willie reads `prd.json` and finds highest priority incomplete ticket
+2. Creates worktree with ticket ID
+3. Generates `TICKET.md` with full ticket details
+4. Launches Claude with autonomous instructions (Ralph Loop style)
+5. Agent reads ticket, implements all acceptance criteria, updates prd.json, commits
+
+**Benefits:**
+- Minimal manual intervention
+- Agents work through backlog autonomously
+- Structured ticket format ensures clarity
+- Progress tracked in prd.json automatically
+- Perfect for "set it and forget it" development
+
+**Prerequisites:**
+- `prd.json` file in Ralph format (see ralph-skills)
+- `jq` installed (`sudo apt-get install jq` or `brew install jq`)
+- Tickets with clear acceptance criteria
+
+**Example prd.json structure:**
+```json
+{
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Add user authentication",
+      "description": "Implement JWT-based authentication",
+      "acceptanceCriteria": [
+        "Login endpoint accepts username/password",
+        "Returns JWT token on success",
+        "Token validates on protected routes"
+      ],
+      "priority": 1,
+      "passes": false
+    }
+  ]
+}
+```
+
 ## Best Practices
 
 ### Task Naming

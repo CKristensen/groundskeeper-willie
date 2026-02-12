@@ -37,16 +37,25 @@ Repository Root
    - Launch Claude Code in worktree
    - Return to original directory on exit
 
-2. **Status** (`willie --status`):
+2. **Autonomous Launch** (`willie --next`):
+   - Read `prd.json` in current directory
+   - Parse with `jq` to find highest priority incomplete ticket
+   - Extract ticket ID, title, description, acceptance criteria
+   - Create worktree using ticket ID
+   - Generate `TICKET.md` with full ticket details and Ralph Loop instructions
+   - Launch Claude Code with autonomous prompt
+   - Agent reads ticket, implements, updates prd.json, commits
+
+3. **Status** (`willie --status`):
    - List all active worktrees
    - Wrapper around `git worktree list`
 
-3. **Cleanup** (`willie --clean <task-id>`):
+4. **Cleanup** (`willie --clean <task-id>`):
    - Remove worktree
    - Optionally delete branch
    - Support bulk cleanup with `--all`
 
-4. **Help** (`willie --help`):
+5. **Help** (`willie --help`):
    - Show usage information
 
 ## Code Structure
@@ -180,7 +189,7 @@ Internal helper functions are prefixed with `_`:
 
 ### Why Single Command Interface?
 
-**Decision:** Use `willie` as the main command with flags (--status, --clean, --help)
+**Decision:** Use `willie` as the main command with flags (--status, --clean, --help, --next)
 
 **Rationale:**
 - Simpler mental model
@@ -189,6 +198,18 @@ Internal helper functions are prefixed with `_`:
 - Cleaner namespace (no `willie-*` commands)
 - Better discoverability through `willie --help`
 - Flags are clearly distinguishable from task IDs
+
+### Why --next for PRD Integration?
+
+**Decision:** Add `willie --next` to auto-launch highest priority ticket from prd.json
+
+**Rationale:**
+- Enables autonomous agent workflows (Ralph Loop style)
+- Reduces manual overhead of selecting and launching tickets
+- Works naturally with PRD-driven development
+- Supports parallel autonomous agents working through backlog
+- Creates structured `TICKET.md` with full context for agent
+- Agent can work independently: read ticket → implement → test → update prd.json → commit
 
 ## Testing
 
@@ -200,6 +221,12 @@ Before committing changes:
 - [ ] Create worktree with `--from main` option
 - [ ] Show help with `willie --help`
 - [ ] List worktrees with `willie --status`
+- [ ] Launch next ticket with `willie --next` (requires prd.json)
+- [ ] Launch next ticket with `--from` option
+- [ ] Verify `TICKET.md` is created in worktree
+- [ ] Verify jq error handling (no jq installed)
+- [ ] Verify prd.json error handling (no file found)
+- [ ] Verify behavior when all tickets complete (passes: true)
 - [ ] Clean up worktree (keep branch)
 - [ ] Clean up worktree (delete branch)
 - [ ] Clean up all worktrees with `willie --clean --all`
@@ -258,22 +285,28 @@ What Groundskeeper Willie intentionally doesn't do:
 1. Create new internal function (e.g., `_willie_newcmd`)
 2. Add case to main `willie()` function
 3. Update help text in `_willie_help()`
-4. Update documentation
-5. Test on both shell versions
+4. Update documentation (README.md, CLAUDE.md, AGENTS.md if relevant)
+5. Implement in both bash and fish versions
+6. Test on both shell versions
 
-Example:
+Example (from `--next` implementation):
 ```bash
 # In main willie() function, add:
 case "$cmd" in
-    --newcmd)
+    --next)
         shift
-        _willie_newcmd "$@"
+        _willie_next "$@"
         ;;
 esac
 
 # Create the function:
-_willie_newcmd() {
-    # Implementation
+_willie_next() {
+    # 1. Validate prerequisites (prd.json, jq)
+    # 2. Query prd.json for highest priority incomplete ticket
+    # 3. Extract ticket details
+    # 4. Create worktree
+    # 5. Generate TICKET.md with full context
+    # 6. Launch Claude with autonomous prompt
 }
 ```
 

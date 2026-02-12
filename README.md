@@ -48,6 +48,9 @@ source ~/.bashrc  # or ~/.zshrc or ~/.config/fish/config.fish
 # Create a worktree and launch Claude Code
 willie PCT-522
 
+# Or auto-launch the next ticket from your PRD
+willie --next
+
 # List all active worktrees
 willie --status
 
@@ -72,6 +75,39 @@ willie hotfix-123 --from main
 2. Creates a new branch named after the task ID
 3. Launches Claude Code in that worktree
 4. Returns you to original directory when Claude Code exits
+
+### `willie --next [--from <branch>]`
+
+**NEW:** Auto-launch the highest priority incomplete ticket from `prd.json`.
+
+**Examples:**
+```bash
+willie --next
+willie --next --from main
+```
+
+**What it does:**
+1. Reads `prd.json` in the current directory
+2. Finds the highest priority ticket where `passes: false`
+3. Creates a worktree with the ticket ID as the task-id
+4. Generates a `TICKET.md` file with full ticket details
+5. Launches Claude Code with autonomous instructions (Ralph Loop style)
+6. Agent works independently to complete the ticket
+
+**Requirements:**
+- `prd.json` file in current directory (Ralph format)
+- `jq` installed (`sudo apt-get install jq` or `brew install jq`)
+
+**Ralph Loop Workflow:**
+The agent will autonomously:
+- Read the ticket details from `TICKET.md`
+- Explore the codebase
+- Implement all acceptance criteria
+- Test changes
+- Update `prd.json` to mark the ticket as complete
+- Commit the changes
+
+This is perfect for working through a backlog of tickets with minimal manual intervention.
 
 ### `willie --status`
 
@@ -99,7 +135,9 @@ Show detailed help message.
 willie --help
 ```
 
-## Workflow Example
+## Workflow Examples
+
+### Manual Workflow
 
 ```bash
 # Start three parallel tasks
@@ -122,6 +160,32 @@ willie --clean PCT-524
 
 # Or clean all at once
 willie --clean --all
+```
+
+### Autonomous Workflow (with PRD)
+
+```bash
+# Let Willie pick the next ticket automatically
+willie --next
+
+# Agent launches and reads TICKET.md
+# Works through acceptance criteria
+# Updates prd.json when complete
+# You review and merge
+
+# Want to work on multiple tickets in parallel?
+willie --next    # Terminal 1 - works on US-004
+willie --next    # Terminal 2 - works on US-005
+willie --next    # Terminal 3 - works on US-006
+
+# Agents work autonomously on different tickets
+# Each updates its own ticket in prd.json
+# You can review progress with git diff
+
+# Clean up completed tickets
+willie --clean US-004
+willie --clean US-005
+willie --clean US-006
 ```
 
 ## How It Works
