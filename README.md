@@ -1,7 +1,10 @@
 # Groundskeeper Willie
 
 > Like the primary adult presence on the school grounds, Groundskeeper Willie monitors the playground, maintains the premises, and keeps the kids (AI agents) from interfering with each other while they work.
-![Uploading image.png…]()
+
+
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/1321abe3-cf8c-45d3-8c0e-a582652b9ea7" />
+
 
 ## What is Groundskeeper Willie?
 
