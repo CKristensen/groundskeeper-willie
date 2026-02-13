@@ -243,6 +243,28 @@
       "passes": false,
       "notes": "",
       "status": "in_progress"
+    },
+    {
+      "id": "US-011",
+      "title": "Show completion status in willie --status output",
+      "description": "As a user running multiple agents, I want willie --status to indicate which worktrees have completed their tasks so I can identify which ones are ready for review and cleanup.",
+      "acceptanceCriteria": [
+        "Update _willie_status() in worktree-agent-functions.sh to read .gw-meta files",
+        "Parse metadata to determine worktree completion status",
+        "Display status indicator next to each worktree (e.g., ✅ completed, 🚧 in progress, ⏸️ idle)",
+        "Detect completion based on: clean working directory + branch merged to parent, or ticket status in prd.json if available",
+        "Show creation timestamp and last activity time",
+        "Update _willie_status() in worktree-agent-functions.fish with same functionality",
+        "Format output in clean table/list format",
+        "Handle missing .gw-meta gracefully (show status as unknown)",
+        "Add --verbose flag to show detailed worktree information",
+        "Shellcheck passes for bash version",
+        "Test in both bash/zsh and fish shells"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": "",
+      "status": "not_started"
     }
   ]
 }
