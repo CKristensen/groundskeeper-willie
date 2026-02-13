@@ -88,11 +88,15 @@ willie --next --from main
 
 **What it does:**
 1. Reads `prd.json` in the current directory
-2. Finds the highest priority ticket where `passes: false`
-3. Creates a worktree with the ticket ID as the task-id
-4. Generates a `TICKET.md` file with full ticket details
-5. Launches Claude Code with autonomous instructions (Ralph Loop style)
-6. Agent works independently to complete the ticket
+2. Finds the highest priority ticket where `passes: false` and not already in progress
+3. Marks the ticket as `"status": "in_progress"` in `prd.json`
+4. Creates a worktree with the ticket ID as the task-id
+5. Generates a `TICKET.md` file with full ticket details
+6. Launches Claude Code with autonomous instructions (Ralph Loop style)
+7. Agent works independently to complete the ticket
+
+**Parallel Agent Support:**
+Multiple `willie --next` calls will automatically select different tickets, allowing you to run multiple autonomous agents in parallel without conflicts.
 
 **Requirements:**
 - `prd.json` file in current directory (Ralph format)

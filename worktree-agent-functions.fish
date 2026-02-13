@@ -234,10 +234,10 @@ function _willie_next
         return 1
     end
 
-    # Get highest priority incomplete ticket
+    # Get highest priority incomplete ticket that's not already being worked on
     set -l ticket_json (jq -c '
         .userStories
-        | map(select(.passes == false))
+        | map(select(.passes == false and (.status // "not_started") != "in_progress"))
         | sort_by(.priority)
         | .[0]
     ' prd.json)
@@ -305,9 +305,33 @@ function _willie_next
     echo "  Location: $worktree_dir"
     echo ""
 
+    # Mark ticket as in_progress in prd.json
+    jq --arg id "$task_id" '
+        .userStories |= map(
+            if .id == $id then
+                . + {status: "in_progress"}
+            else
+                .
+            end
+        )
+    ' prd.json > prd.json.tmp; and mv prd.json.tmp prd.json
+
+    echo "Marked ticket $task_id as 'in_progress' in prd.json"
+    echo ""
+
     # Create worktree with new branch
     if not git worktree add -b "$branch_name" "$worktree_dir" "$base_branch"
         echo "Error: Failed to create worktree"
+        # Revert status change on failure
+        jq --arg id "$task_id" '
+            .userStories |= map(
+                if .id == $id then
+                    del(.status)
+                else
+                    .
+                end
+            )
+        ' prd.json > prd.json.tmp; and mv prd.json.tmp prd.json
         return 1
     end
 

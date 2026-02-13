@@ -135,11 +135,12 @@ willie --next    # Terminal 3 - picks US-006
 ```
 
 **What happens:**
-1. Willie reads `prd.json` and finds highest priority incomplete ticket
-2. Creates worktree with ticket ID
-3. Generates `TICKET.md` with full ticket details
-4. Launches Claude with autonomous instructions (Ralph Loop style)
-5. Agent reads ticket, implements all acceptance criteria, updates prd.json, commits
+1. Willie reads `prd.json` and finds highest priority incomplete ticket (not already in progress)
+2. Marks ticket as `"status": "in_progress"` in `prd.json` to prevent other agents from selecting it
+3. Creates worktree with ticket ID
+4. Generates `TICKET.md` with full ticket details
+5. Launches Claude with autonomous instructions (Ralph Loop style)
+6. Agent reads ticket, implements all acceptance criteria, updates prd.json, commits
 
 **Benefits:**
 - Minimal manual intervention
@@ -147,6 +148,7 @@ willie --next    # Terminal 3 - picks US-006
 - Structured ticket format ensures clarity
 - Progress tracked in prd.json automatically
 - Perfect for "set it and forget it" development
+- **Multiple agents can run in parallel without working on the same ticket**
 
 **Prerequisites:**
 - `prd.json` file in Ralph format (see ralph-skills)
