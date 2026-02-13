@@ -2,6 +2,14 @@
   "project": "Groundskeeper Willie",
   "branchName": "ralph/one-line-installer-v01",
   "description": "Transform Groundskeeper Willie into a mainstream tool with one-line installation, automatic shell detection, and foundation for agent monitoring",
+  "_schema": {
+    "status_values": [
+      "not_started",
+      "in_progress",
+      "completed"
+    ],
+    "status_description": "Tracks ticket workflow state. 'in_progress' is set by willie --next to prevent duplicate work across parallel agents."
+  },
   "userStories": [
     {
       "id": "US-001",
@@ -18,7 +26,8 @@
       ],
       "priority": 1,
       "passes": true,
-      "notes": "Completed. Script created with all features: detect_shell() function with $SHELL check and fallback to parent process, identifies bash/zsh/fish, clear error messages, executable with proper shebang. Script tested successfully (detected bash). Shellcheck best practices followed (proper quoting, local variables, [[ ]] tests, set -e). Shellcheck tool not available on system for automated verification."
+      "notes": "Completed. Script created with all features: detect_shell() function with $SHELL check and fallback to parent process, identifies bash/zsh/fish, clear error messages, executable with proper shebang. Script tested successfully (detected bash). Shellcheck best practices followed (proper quoting, local variables, [[ ]] tests, set -e). Shellcheck tool not available on system for automated verification.",
+      "status": "completed"
     },
     {
       "id": "US-001.1",
@@ -33,7 +42,8 @@
       ],
       "priority": 1.1,
       "passes": true,
-      "notes": "Completed and enhanced. All instances of agent-worktree renamed to willie in both shell function files. Removed --claude and --codex flags, simplified to only support Claude Code. Consolidated into single command with flags: willie <task-id>, willie --status, willie --clean <task-id>, willie --help. Task IDs never conflict with commands. Updated all documentation (README.md, AGENTS.md, CLAUDE.md). Shellcheck best practices followed."
+      "notes": "Completed and enhanced. All instances of agent-worktree renamed to willie in both shell function files. Removed --claude and --codex flags, simplified to only support Claude Code. Consolidated into single command with flags: willie <task-id>, willie --status, willie --clean <task-id>, willie --help. Task IDs never conflict with commands. Updated all documentation (README.md, AGENTS.md, CLAUDE.md). Shellcheck best practices followed.",
+      "status": "completed"
     },
     {
       "id": "US-002",
@@ -51,7 +61,8 @@
       ],
       "priority": 2,
       "passes": true,
-      "notes": "Completed. Implemented three functions: get_config_file() to detect appropriate config file (handles macOS bash with ~/.bash_profile vs Linux ~/.bashrc, zsh with ~/.zshrc, fish with ~/.config/fish/config.fish), backup_config() that creates timestamped backups (e.g., .bashrc.backup.20260212-163159) with permissions preserved using cp -p, and update_config() that adds source line with clear comment markers (>>> groundskeeper-willie >>>). Idempotence verified - script detects existing installation and doesn't add duplicates. Tested successfully on bash shell. Shellcheck passed with no errors. Config file creation and directory creation (for fish) handled gracefully."
+      "notes": "Completed. Implemented three functions: get_config_file() to detect appropriate config file (handles macOS bash with ~/.bash_profile vs Linux ~/.bashrc, zsh with ~/.zshrc, fish with ~/.config/fish/config.fish), backup_config() that creates timestamped backups (e.g., .bashrc.backup.20260212-163159) with permissions preserved using cp -p, and update_config() that adds source line with clear comment markers (>>> groundskeeper-willie >>>). Idempotence verified - script detects existing installation and doesn't add duplicates. Tested successfully on bash shell. Shellcheck passed with no errors. Config file creation and directory creation (for fish) handled gracefully.",
+      "status": "completed"
     },
     {
       "id": "US-003",
@@ -70,7 +81,8 @@
       ],
       "priority": 3,
       "passes": true,
-      "notes": "Completed. Implemented install_functions_file() that copies the appropriate shell functions file (worktree-agent-functions.sh or worktree-agent-functions.fish) to ~/.groundskeeper-willie/. Creates directory if needed, validates source file exists, handles errors gracefully, and makes files executable with chmod +x. This approach assumes user has cloned/downloaded the repo first, then runs ./install.sh locally. For remote curl | bash installation, see US-003.1."
+      "notes": "Completed. Implemented install_functions_file() that copies the appropriate shell functions file (worktree-agent-functions.sh or worktree-agent-functions.fish) to ~/.groundskeeper-willie/. Creates directory if needed, validates source file exists, handles errors gracefully, and makes files executable with chmod +x. This approach assumes user has cloned/downloaded the repo first, then runs ./install.sh locally. For remote curl | bash installation, see US-003.1.",
+      "status": "completed"
     },
     {
       "id": "US-003.1",
@@ -91,7 +103,8 @@
       ],
       "priority": 3.1,
       "passes": true,
-      "notes": "Completed. Implemented three new functions: download_file() with curl/wget fallback, verify_shell_file() that validates downloaded content (checks for shebang or function keywords to catch HTML error pages), and updated install_functions_file() to download from GitHub raw URLs (https://raw.githubusercontent.com/CKristensen/groundskeeper-willie/master/worktree-agent-functions.{sh,fish}). Downloads verified working for both bash and fish versions. Script handles network failures gracefully with clear error messages and falls back to local copy if available. One-line installation command: curl -fsSL https://raw.githubusercontent.com/CKristensen/groundskeeper-willie/master/install.sh | bash. Files stored in ~/.groundskeeper-willie/ and made executable. Shellcheck not available on system but code follows best practices (proper quoting, local variables, error handling with set -e, command existence checks)."
+      "notes": "Completed. Implemented three new functions: download_file() with curl/wget fallback, verify_shell_file() that validates downloaded content (checks for shebang or function keywords to catch HTML error pages), and updated install_functions_file() to download from GitHub raw URLs (https://raw.githubusercontent.com/CKristensen/groundskeeper-willie/master/worktree-agent-functions.{sh,fish}). Downloads verified working for both bash and fish versions. Script handles network failures gracefully with clear error messages and falls back to local copy if available. One-line installation command: curl -fsSL https://raw.githubusercontent.com/CKristensen/groundskeeper-willie/master/install.sh | bash. Files stored in ~/.groundskeeper-willie/ and made executable. Shellcheck not available on system but code follows best practices (proper quoting, local variables, error handling with set -e, command existence checks).",
+      "status": "completed"
     },
     {
       "id": "US-004",
@@ -109,7 +122,8 @@
       ],
       "priority": 4,
       "passes": true,
-      "notes": "Completed. Implemented verify_installation() that tests if willie function is loadable by sourcing the functions file in a subshell and checking for the willie function (using 'type willie' for bash/zsh, 'functions -q willie' for fish). Implemented print_success_message() with comprehensive next steps including: shell restart vs source command instructions, verification command 'type willie', example commands 'willie PCT-123' and 'willie --next', quick start command reference, link to GitHub documentation (#quick-start), and detailed uninstall instructions (remove source line between markers, restore from backup, remove ~/.groundskeeper-willie). Success message formatted with visual separators and color-coded output. Shellcheck passed with no errors. Integration tested in main() function - verification runs after config update, and success message displays on successful verification."
+      "notes": "Completed. Implemented verify_installation() that tests if willie function is loadable by sourcing the functions file in a subshell and checking for the willie function (using 'type willie' for bash/zsh, 'functions -q willie' for fish). Implemented print_success_message() with comprehensive next steps including: shell restart vs source command instructions, verification command 'type willie', example commands 'willie PCT-123' and 'willie --next', quick start command reference, link to GitHub documentation (#quick-start), and detailed uninstall instructions (remove source line between markers, restore from backup, remove ~/.groundskeeper-willie). Success message formatted with visual separators and color-coded output. Shellcheck passed with no errors. Integration tested in main() function - verification runs after config update, and success message displays on successful verification.",
+      "status": "completed"
     },
     {
       "id": "US-005",
@@ -128,7 +142,8 @@
       ],
       "priority": 5,
       "passes": false,
-      "notes": ""
+      "notes": "",
+      "status": "not_started"
     },
     {
       "id": "US-006",
@@ -146,7 +161,8 @@
       ],
       "priority": 6,
       "passes": false,
-      "notes": ""
+      "notes": "",
+      "status": "not_started"
     },
     {
       "id": "US-007",
@@ -164,7 +180,8 @@
       ],
       "priority": 7,
       "passes": false,
-      "notes": ""
+      "notes": "",
+      "status": "not_started"
     },
     {
       "id": "US-008",
@@ -182,7 +199,8 @@
       ],
       "priority": 8,
       "passes": false,
-      "notes": ""
+      "notes": "",
+      "status": "not_started"
     },
     {
       "id": "US-009",
@@ -199,7 +217,8 @@
       ],
       "priority": 9,
       "passes": false,
-      "notes": ""
+      "notes": "",
+      "status": "not_started"
     }
   ]
 }
