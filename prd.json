@@ -265,6 +265,9 @@
       "passes": false,
       "notes": "",
       "status": "not_started"
+      "passes": true,
+      "notes": "Completed. Created comprehensive uninstall.sh script with all required features: proper shebang (#!/usr/bin/env bash), shell detection using same detect_shell() and get_config_file() logic as install.sh (supports bash/zsh/fish), removes source lines between comment markers (# >>> groundskeeper-willie >>>) from config file using sed, offers optional restore from most recent backup file with confirmation prompt, removes ~/.groundskeeper-willie/ directory and all contents, lists active worktrees with git worktree list before proceeding, supports --force flag to skip all confirmations, supports --keep-worktrees flag to preserve active worktrees, displays comprehensive dry-run summary showing what will be removed and preserved before confirmation, provides clear success message detailing what was removed and what remains with next steps, gracefully handles case where Groundskeeper Willie is not installed (checks both config file markers and installation directory), script is fully idempotent and safe to run multiple times, shellcheck passes with zero errors or warnings. Additional features: --help flag with detailed usage information, color-coded output for better UX, platform-independent backup file detection using stat (supports both macOS and Linux), proper error handling with informative messages, cleanup of empty .worktrees directory after removing worktrees. Tested successfully: help output verified, dry-run summary tested showing 6 active worktrees and installation directory, cancellation handling confirmed, syntax validation passed (bash -n), shellcheck validation passed with no issues.",
+      "status": "completed"
     }
   ]
 }
