@@ -58,6 +58,279 @@ Repository Root
 5. **Help** (`willie --help`):
    - Show usage information
 
+## Agent Monitoring Architecture
+
+### Overview
+
+Groundskeeper Willie includes infrastructure for monitoring autonomous AI agents working in parallel worktrees. Version 0.1 lays the foundation with metadata tracking, while v0.2 will implement active monitoring and notifications.
+
+**Current State (v0.1):**
+- Metadata foundation only (.gw-meta files created per worktree)
+- No active monitoring or alerting
+- Stub command (`willie --status`) placeholder for future functionality
+
+**Future Vision (v0.2):**
+- Real-time agent activity monitoring
+- Desktop and terminal notifications for stuck agents
+- Enhanced status dashboard with progress tracking
+- Automatic detection of inactive or problematic worktrees
+
+### .gw-meta File Format
+
+Each worktree has a metadata file at `.worktrees/<task-id>/.gw-meta` containing JSON:
+
+```json
+{
+  "created_at": "2026-02-12T14:30:22Z",
+  "task_id": "PCT-123",
+  "branch": "PCT-123",
+  "shell": "bash",
+  "claude_version": "v0.1.0"
+}
+```
+
+**Fields:**
+- `created_at` - ISO 8601 timestamp of worktree creation
+- `task_id` - The task/ticket identifier (same as worktree directory name)
+- `branch` - Git branch name (typically same as task_id)
+- `shell` - Shell type that created the worktree (bash, zsh, or fish)
+- `claude_version` - Groundskeeper Willie version used to create worktree
+
+**Purpose:**
+- Track worktree lifecycle for monitoring
+- Enable activity detection and stuck agent alerts
+- Support enhanced status reporting
+- Provide audit trail for parallel development
+- Foundation for future analytics and optimization
+
+**Location:**
+- Inside the worktree directory (`.worktrees/<task-id>/.gw-meta`)
+- Git-ignored (never committed)
+- Created immediately after successful worktree creation
+- Persists until worktree cleanup
+
+### Planned Monitoring Approach (v0.2)
+
+**Activity Detection:**
+
+Monitoring will track agent activity through multiple signals:
+1. **Git activity** - Commits, branch updates, staged changes
+2. **File modifications** - Watch worktree directory for file changes
+3. **Process detection** - Check for running Claude Code instances
+4. **Timestamp comparison** - Compare current time against creation/last activity
+
+**Monitoring Triggers:**
+
+Example conditions that will generate alerts:
+
+- **Stuck Agent Detection:**
+  - No commits for >30 minutes after worktree creation
+  - No file changes for >15 minutes (using filesystem timestamps)
+  - Claude Code process not found but worktree exists
+  - Agent session terminated unexpectedly
+
+- **Completion Detection:**
+  - Branch merged to main/master
+  - PR marked as closed
+  - Worktree inactive for >2 hours with clean working directory
+
+- **Error Conditions:**
+  - Merge conflicts detected in worktree
+  - Test failures (if CI integration available)
+  - Uncommitted changes with no recent activity
+
+**Monitoring Implementation Strategy:**
+
+```bash
+# Background monitoring daemon (v0.2)
+willie-monitor --daemon
+
+# Checks every N minutes:
+# 1. List all .worktrees/*/.gw-meta files
+# 2. For each worktree:
+#    - Check git log for recent commits
+#    - Check filesystem for recent modifications
+#    - Check for running Claude Code process
+#    - Compare against trigger conditions
+# 3. Send notifications for alerts
+```
+
+### Notification System Design
+
+**Desktop Notifications:**
+
+Use OS-native notification systems:
+- **macOS**: `osascript` or `terminal-notifier`
+- **Linux**: `notify-send` (libnotify)
+- **Fallback**: Terminal bell + message
+
+**Notification Types:**
+
+```bash
+# Success notification
+"✅ PCT-123: Agent completed task (3 commits, 45 minutes)"
+
+# Warning notification
+"⚠️ PCT-456: No activity for 30 minutes"
+
+# Error notification
+"❌ PCT-789: Merge conflicts detected"
+
+# Info notification
+"ℹ️ PCT-321: Agent started working on ticket"
+```
+
+**Notification Preferences (v0.2+):**
+
+Users will be able to configure:
+- Notification threshold (time before alert)
+- Quiet hours (no notifications during sleep)
+- Notification channels (desktop, terminal, none)
+- Per-worktree notification settings
+
+**Terminal Notifications:**
+
+For users without desktop environment or who prefer terminal:
+```bash
+willie --status
+# Displays:
+# 📊 Active Worktrees (3)
+# ✅ PCT-123  [master]  3h ago  ✓ 5 commits
+# ⚠️ PCT-456  [master]  45m ago  ! No recent activity
+# 🔴 PCT-789  [develop] 2h ago  ✗ Merge conflicts
+```
+
+### willie-status Command Vision
+
+**Basic Usage (v0.2):**
+
+```bash
+# List all active worktrees with status
+willie --status
+
+# Show detailed view
+willie --status --verbose
+
+# Show only problematic worktrees
+willie --status --warnings
+
+# Watch mode (live updates)
+willie --status --watch
+```
+
+**Output Format:**
+
+```
+📊 Groundskeeper Willie Status
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Active Worktrees: 3
+
+✅ PCT-123  [master→feature/auth]
+   Created: 3h ago  |  Last activity: 5m ago
+   Status: Active - 5 commits, 12 files changed
+   Agent: Claude Code (running)
+
+⚠️ PCT-456  [master→bugfix/login]
+   Created: 45m ago  |  Last activity: 30m ago
+   Status: Inactive - 1 commit, no recent changes
+   Agent: Claude Code (not found)
+   → Warning: No activity detected for 30 minutes
+
+🔴 PCT-789  [develop→feature/ui]
+   Created: 2h ago  |  Last activity: 15m ago
+   Status: Blocked - merge conflicts detected
+   Agent: Claude Code (running)
+   → Error: 3 files with merge conflicts
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Run 'willie --clean <task-id>' to remove completed worktrees
+Run 'willie --status --watch' for live updates
+```
+
+**Verbose Mode:**
+
+Shows additional details:
+- Full commit history in worktree
+- List of modified files
+- Process IDs and resource usage
+- prd.json ticket status (if using Ralph Loop)
+
+**Integration with Ralph Loop:**
+
+For autonomous agents using prd.json:
+```bash
+willie --status --ralph
+
+# Shows:
+# ✅ US-001 [Completed] - Install script created (3 commits)
+# 🚧 US-002 [In Progress] - Config backup logic (1 commit, 30m active)
+# ⏸️ US-003 [Not Started] - No worktree yet
+```
+
+### Example Monitoring Trigger Conditions
+
+**Tier 1 - Immediate Alerts:**
+- Merge conflicts detected → Desktop notification + terminal alert
+- Process crashed (exit code != 0) → Desktop notification
+- Disk space critically low in worktree → Desktop notification
+
+**Tier 2 - Warning Alerts:**
+- No commits for 30 minutes after creation → Desktop notification
+- No file changes for 15 minutes → Terminal only (non-intrusive)
+- Working directory has uncommitted changes + no activity 20 minutes → Terminal only
+
+**Tier 3 - Info Alerts:**
+- Agent completed work (branch merged) → Desktop notification (success)
+- New worktree created → Terminal only
+- Worktree idle for 2+ hours with clean state → Suggest cleanup
+
+**Configurable Thresholds (v0.2):**
+
+```bash
+# ~/.groundskeeper-willie/config.json (future)
+{
+  "monitoring": {
+    "stuck_threshold_minutes": 30,
+    "file_activity_threshold_minutes": 15,
+    "completion_idle_hours": 2,
+    "enable_desktop_notifications": true,
+    "quiet_hours": {
+      "enabled": true,
+      "start": "22:00",
+      "end": "08:00"
+    }
+  }
+}
+```
+
+### v0.1 Implementation Notes
+
+**What's Included in v0.1:**
+
+✅ Metadata file structure defined
+✅ .gw-meta creation points identified in code
+✅ Stub command framework (`willie --status` prints "Coming in v0.2")
+✅ Architecture documented (this section)
+
+**What's NOT Included in v0.1:**
+
+❌ No active monitoring daemon
+❌ No notification system
+❌ No activity detection logic
+❌ No dashboard/status display
+❌ No trigger evaluation
+
+**Rationale:**
+
+v0.1 focuses on installation and basic workflow. The metadata foundation ensures v0.2 monitoring can be added without refactoring core functionality. This follows the principle: "build the foundation, then add the features."
+
+**Future Implementation Path:**
+
+1. **v0.2 (Monitoring):** Add active monitoring with basic notifications
+2. **v0.3 (Intelligence):** Add ML-based stuck detection, pattern recognition
+3. **v1.0 (Platform):** Full dashboard, multi-agent coordination, cloud sync
+
 ## Code Structure
 
 ### Bash Version (`worktree-agent-functions.sh`)

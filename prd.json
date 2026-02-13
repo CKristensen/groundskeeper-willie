@@ -216,6 +216,30 @@
         "Note that v0.1 only has foundation, no active monitoring"
       ],
       "priority": 9,
+      "passes": true,
+      "notes": "Completed. Added comprehensive 'Agent Monitoring Architecture' section to CLAUDE.md after the Architecture section. Documented .gw-meta file format (JSON with created_at, task_id, branch, shell, claude_version fields) and purpose (lifecycle tracking, activity detection, audit trail). Described v0.2 monitoring approach including activity detection (git activity, file modifications, process detection), monitoring triggers (stuck agents, completion detection, error conditions), and background daemon strategy. Documented notification system design with OS-native notifications (osascript/terminal-notifier for macOS, notify-send for Linux), notification types (success/warning/error/info), and future configuration preferences. Explained willie-status command vision with basic usage, detailed output format showing active worktrees with status indicators (✅/⚠️/🔴), verbose mode, and Ralph Loop integration. Included example monitoring trigger conditions in three tiers (immediate/warning/info alerts) with specific thresholds and configurable settings for v0.2. Clearly noted v0.1 implementation status: metadata foundation only, no active monitoring/notifications/dashboard in v0.1, with rationale for phased approach and future implementation path (v0.2 monitoring, v0.3 intelligence, v1.0 platform).",
+      "status": "completed"
+    },
+    {
+      "id": "US-010",
+      "title": "Create uninstall.sh script",
+      "description": "As a user, I want a clean uninstall script so I can completely remove Groundskeeper Willie from my system if needed.",
+      "acceptanceCriteria": [
+        "Create uninstall.sh in repository root with proper shebang",
+        "Detect user's shell (bash/zsh/fish) using same logic as install.sh",
+        "Remove source line from shell config file (between comment markers)",
+        "Optionally restore from backup file if it exists",
+        "Remove ~/.groundskeeper-willie/ directory and all contents",
+        "List active worktrees and warn user before proceeding",
+        "Provide --force flag to skip confirmation prompts",
+        "Provide --keep-worktrees flag to preserve worktrees",
+        "Display what will be removed before confirmation (dry-run summary)",
+        "Clear success message showing what was removed",
+        "Handle case where Groundskeeper Willie not installed (graceful exit)",
+        "Script is idempotent (safe to run multiple times)",
+        "Shellcheck passes"
+      ],
+      "priority": 10,
       "passes": false,
       "notes": "",
       "status": "in_progress"
