@@ -143,7 +143,7 @@
       "priority": 5,
       "passes": false,
       "notes": "",
-      "status": "not_started"
+      "status": "in_progress"
     },
     {
       "id": "US-006",
@@ -162,7 +162,7 @@
       "priority": 6,
       "passes": false,
       "notes": "",
-      "status": "not_started"
+      "status": "in_progress"
     },
     {
       "id": "US-007",

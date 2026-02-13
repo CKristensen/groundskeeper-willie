@@ -228,10 +228,23 @@ _willie_next() {
     return 1
   fi
 
-  # Get highest priority incomplete ticket that's not already being worked on
-  local ticket_json=$(jq -c '
+  # Get repo root to check for existing worktrees
+  local repo_root=$(git rev-parse --show-toplevel)
+  
+  # Get list of existing worktree IDs
+  local existing_worktrees=""
+  if [[ -d "$repo_root/.worktrees" ]]; then
+    existing_worktrees=$(ls -1 "$repo_root/.worktrees" 2>/dev/null | tr '\n' ',' | sed 's/,$//')
+  fi
+  
+  # Get highest priority incomplete ticket that's not already in a worktree
+  local ticket_json=$(jq -c --arg existing "$existing_worktrees" '
+    ($existing | split(",") | map(select(length > 0))) as $worktree_ids |
     .userStories
-    | map(select(.passes == false and (.status // "not_started") != "in_progress"))
+    | map(select(
+        .passes == false and 
+        (.id as $ticket_id | $worktree_ids | any(. == $ticket_id) | not)
+      ))
     | sort_by(.priority)
     | .[0]
   ' prd.json)

@@ -234,10 +234,23 @@ function _willie_next
         return 1
     end
 
-    # Get highest priority incomplete ticket that's not already being worked on
-    set -l ticket_json (jq -c '
+    # Get repo root to check for existing worktrees
+    set -l repo_root (git rev-parse --show-toplevel)
+    
+    # Get list of existing worktree IDs
+    set -l existing_worktrees ""
+    if test -d "$repo_root/.worktrees"
+        set existing_worktrees (ls -1 "$repo_root/.worktrees" 2>/dev/null | string join ',')
+    end
+    
+    # Get highest priority incomplete ticket that's not already in a worktree
+    set -l ticket_json (jq -c --arg existing "$existing_worktrees" '
+        ($existing | split(",") | map(select(length > 0))) as $worktree_ids |
         .userStories
-        | map(select(.passes == false and (.status // "not_started") != "in_progress"))
+        | map(select(
+            .passes == false and 
+            (.id as $ticket_id | $worktree_ids | any(. == $ticket_id) | not)
+          ))
         | sort_by(.priority)
         | .[0]
     ' prd.json)
